@@ -26,7 +26,7 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView Disconnected;
+    TextView disconnected;
     ProgressDialog pd;
     private RecyclerView recyclerView;
     private Item items;
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initViews();
-        swipeContainer = findViewById(R.id.swipeContainer);
+        swipeContainer =  (SwipeRefreshLayout)findViewById(R.id.swipeContainer);
         swipeContainer.setColorSchemeResources(android.R.color.holo_orange_dark);
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -49,23 +49,25 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    
     private void initViews() {
         pd = new ProgressDialog(this);
         pd.setMessage("Fetching Github Users Profile...");
         pd.setCancelable(false);
         pd.show();
-        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.smoothScrollToPosition(0);
         loadJSON();
     }
-
+    
+   
     private void loadJSON() {
-        Disconnected = findViewById(R.id.disconnected);
+        disconnected = (TextView)findViewById(R.id.disconnected);
         try {
-            Client Client = new Client();
-            Service apiService =
-                    com.example.android.fetchdeveloperprofile.api.Client.getClient().create(Service.class);
+            Client client = new Client();
+            Service apiService = client.getClient()
+                .create(Service.class);
             Call<ItemResponse> call = apiService.getItems();
             call.enqueue(new Callback<ItemResponse>() {
                 @Override
@@ -81,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onFailure(Call<ItemResponse> call, Throwable t) {
                     Log.d("Error", t.getMessage());
                     Toast.makeText(MainActivity.this, "Error Fetching Developer Profile!", Toast.LENGTH_SHORT).show();
-                    Disconnected.setVisibility(View.VISIBLE);
+                    disconnected.setVisibility(View.VISIBLE);
                     pd.hide();
                 }
             });
